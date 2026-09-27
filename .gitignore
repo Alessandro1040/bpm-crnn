@@ -6,6 +6,10 @@ data/
 runs/
 *.pth
 *.pt
+!models/*.pt
+
+# Data (synthetic mini-dataset used by the test notebook)
+data_synth/
 *.ckpt
 
 # Python

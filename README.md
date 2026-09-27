@@ -25,6 +25,19 @@ BPM = Σ p_i · bin_i     (both paths, then averaged)
 
 ---
 
+## Notebooks (Colab)
+
+Ogni notebook clona il repo, scarica i **pesi** (`models/bpm_crnn_gtzan.pt`, 21 MB,
+committato qui e allegato alla [release v1.0](https://github.com/Alessandro1040/bpm-crnn/releases/tag/v1.0-gtzan))
+e gira end-to-end senza setup:
+
+| notebook | cosa fa | |
+|---|---|---|
+| [`01_demo_stima_bpm`](notebooks/01_demo_stima_bpm.ipynb) | carica i pesi da GitHub e stima il BPM: demo autocontenuta su loop a BPM noto + **il tuo file** + grafici (mel, BPM per finestra, distribuzione) | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/Alessandro1040/bpm-crnn/blob/main/notebooks/01_demo_stima_bpm.ipynb) |
+| [`02_valutazione_gtzan`](notebooks/02_valutazione_gtzan.ipynb) | scarica GTZAN + annotazioni, ricostruisce la cache Mel e misura **tutte le metriche** sul test set; confronto con i numeri di `results/` | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/Alessandro1040/bpm-crnn/blob/main/notebooks/02_valutazione_gtzan.ipynb) |
+| [`03_training_colab`](notebooks/03_training_colab.ipynb) | **addestra da zero** su GPU (T4), valuta e confronta col modello rilasciato; export dei pesi per l'inferenza | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/Alessandro1040/bpm-crnn/blob/main/notebooks/03_training_colab.ipynb) |
+| [`04_test_pipeline`](notebooks/04_test_pipeline.ipynb) | **verifica** la pipeline: 28 test unitari, smoke test end-to-end su un mini-dataset sintetico (nessun download), coerenza dei pesi pubblicati | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/Alessandro1040/bpm-crnn/blob/main/notebooks/04_test_pipeline.ipynb) |
+
 ## Repository layout
 
 ```
@@ -37,15 +50,28 @@ bpm-crnn/
 │   ├── evaluate.py   # test/val report, per-genre table, plots
 │   ├── infer.py      # BPMExtractor + CLI
 │   └── utils.py      # device/seeding/logger/checkpoint helpers
+├── notebooks/        # 4 Colab notebooks (demo, evaluation, training, verification)
+├── models/
+│   └── bpm_crnn_gtzan.pt   # inference-only weights (21 MB) + Mel config + metrics
 ├── scripts/
-│   ├── prepare_data.sh   # download GTZAN + annotations, build cache
-│   ├── run_training.sh   # background training (nohup + caffeinate + pid file)
-│   └── status.sh         # one-glance run status
+│   ├── prepare_data.sh        # download GTZAN + annotations, build cache
+│   ├── run_training.sh        # background training (nohup + caffeinate + pid file)
+│   ├── post_training.sh       # evaluate + plots + README results (+ push)
+│   ├── export_inference.py    # strip optimizer state -> models/*.pt
+│   ├── update_readme_results.py
+│   └── status.sh              # one-glance run status
+├── results/          # metrics, history, per-track predictions of the released run
+├── assets/           # plots (predictions scatter, error histogram, training curves)
 ├── tests/            # 28 unit tests (model, metrics, data pipeline, augmentation)
 └── conftest.py
 ```
 
 ## Quick start
+
+Senza installare nulla: apri il [**notebook 01 (demo)**](notebooks/01_demo_stima_bpm.ipynb)
+su Colab — carica i pesi gia' addestrati da GitHub e stima il BPM di un tuo file.
+
+In locale:
 
 ```bash
 # 1) environment (Python >= 3.10)
@@ -61,6 +87,14 @@ bash scripts/run_training.sh                     # defaults: 60 epochs, runs/gtz
 python -m src.evaluate --ckpt runs/gtzan/best.pth      # metrics + per-genre + plots
 python -m src.infer --ckpt runs/gtzan/best.pth --audio song.mp3
 ```
+
+I pesi del modello pubblicato sono nel repo come file **inference-only** (21 MB,
+senza stato dell'ottimizzatore), quindi per l'inferenza non serve allenare nulla:
+
+```bash
+python -m src.infer --ckpt models/bpm_crnn_gtzan.pt --audio song.mp3     # -> 128.05
+python scripts/export_inference.py --ckpt runs/gtzan/best.pth \
+    --out models/bpm_crnn_gtzan.pt            # come e' stato prodotto
 
 > **Disk space**: the dataset needs ~1.2 GB (audio) + ~0.35 GB (Mel cache) +
 > ~0.15 GB (checkpoints). `scripts/prepare_data.sh` deletes the 1.2 GB tarball

@@ -66,17 +66,31 @@ class BPMExtractor:
             "train_config": checkpoint.get("config") or {},
         }
 
-        # spectrogram settings: explicit args > Mel cache config > defaults
+        # spectrogram settings: explicit args > Mel cache config > checkpoint config
+        # (explicit) > (cache) > (checkpoint) > hard-coded defaults
         cache_config: Dict[str, float] = {}
         if cache_dir is not None:
             config_path = Path(cache_dir) / "cache_config.json"
             if config_path.exists():
                 cache_config = json.loads(config_path.read_text())
-        self.sr = int(sr or cache_config.get("sr", SR))
-        self.n_mels = int(n_mels or arch.get("n_mels") or cache_config.get("n_mels", N_MELS))
-        self.n_fft = int(n_fft or cache_config.get("n_fft", N_FFT))
-        self.hop_length = int(hop_length or cache_config.get("hop_length", HOP_LENGTH))
-        self.fmax = float(fmax or cache_config.get("fmax", FMAX))
+        ckpt_config: Dict[str, float] = {
+            key: value for key, value in (checkpoint.get("config") or {}).items()
+            if key in ("sr", "n_mels", "n_fft", "hop_length", "fmax")
+        }
+
+        def pick(name: str, default: float) -> float:
+            for source in (cache_config, ckpt_config):
+                if name in source:
+                    return float(source[name])
+            return float(default)
+
+        self.sr = int(sr if sr is not None else pick("sr", SR))
+        self.n_mels = int(n_mels if n_mels is not None
+                         else (arch.get("n_mels") or pick("n_mels", N_MELS)))
+        self.n_fft = int(n_fft if n_fft is not None else pick("n_fft", N_FFT))
+        self.hop_length = int(hop_length if hop_length is not None
+                             else pick("hop_length", HOP_LENGTH))
+        self.fmax = float(fmax if fmax is not None else pick("fmax", FMAX))
 
     # ------------------------------------------------------------------ helpers
     def _mel_tensor(self, y: np.ndarray) -> torch.Tensor:
