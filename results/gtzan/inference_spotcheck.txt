@@ -1,0 +1,13 @@
+device=mps sr=22050 n_mels=128
+blues/blues.00001          ref=  67.77 pred= 104.01 err= +36.24 windows=5 spread= 1.02 tta=True time= 4.75s
+classical/classical.00005  ref= 140.21 pred= 140.70 err=  +0.49 windows=5 spread=22.80 tta=True time= 1.33s
+country/country.00000      ref=  85.53 pred=  90.38 err=  +4.85 windows=5 spread=10.80 tta=True time= 1.05s
+disco/disco.00003          ref= 126.42 pred= 125.53 err=  -0.89 windows=5 spread= 0.72 tta=True time= 0.70s
+hiphop/hiphop.00002        ref=  99.33 pred= 100.74 err=  +1.41 windows=5 spread= 2.03 tta=True time= 0.71s
+jazz/jazz.00017            ref= 212.81 pred= 141.75 err= -71.06 windows=5 spread=16.63 tta=True time= 0.83s
+metal/metal.00001          ref= 155.91 pred= 189.31 err= +33.40 windows=5 spread= 8.53 tta=True time= 0.70s
+pop/pop.00010              ref= 108.31 pred= 104.55 err=  -3.76 windows=5 spread= 0.97 tta=True time= 0.71s
+reggae/reggae.00000        ref= 122.25 pred= 121.58 err=  -0.67 windows=5 spread= 0.72 tta=True time= 0.71s
+rock/rock.00002            ref= 105.44 pred= 105.91 err=  +0.47 windows=5 spread= 3.68 tta=True time= 0.72s
+
+mean abs error on 10 tracks: 15.32 BPM (median 2.58)

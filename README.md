@@ -292,6 +292,48 @@ Test split: **100 held-out GTZAN tracks** (best epoch 54/60, training time 29m23
 * full report: `runs/gtzan/RESULTS.md`, `runs/gtzan/test_metrics.json`, per-track predictions via `python -m src.evaluate`
 <!-- RESULTS:END -->
 
+### Interpretation (honest reading of the numbers)
+
+* **Heavy-tailed errors**: the *median* absolute error is **4.45 BPM** while the
+  mean is 15.8 BPM. For about half of the tracks the model is within ~4 BPM; the
+  rest are hard cases (jazz, classical, metal, country, reggae) where even human
+  annotators disagree on "the" tempo.
+* **Octave errors are not the dominant failure**: only 17 % of the predictions
+  land on half/double tempo (octave assignment: 83 % ×1, 9 % ×0.5, 8 % ×2), so
+  the remaining error is genuine tempo confusion on ambiguous material — not the
+  classic doubling problem.
+* **Genre matters** (see the per-genre table printed by `src.evaluate`): disco
+  (MAE 2.8, Acc@5 % 90 %), hiphop (5.5), pop (9.6), rock (10.6) are already
+  usable, while classical/jazz/metal/reggae (~22–26 BPM) are dominated by
+  annotation ambiguity and by material without a clear percussive pulse.
+* There is a small **negative bias (−4.3 BPM)**: the model leans towards the
+  slower metrical level, consistent with the synthetic training loops.
+* **This is not the "MAE < 2 BPM / Acc@1 % > 80 %" regime**: that requires a
+  larger and cleaner corpus (Ballroom / Extended Ballroom, GiantSteps, FMA +
+  AcousticBrainz labels) and/or a pretrained front-end — with 798 training tracks
+  of 30 s and noisy references, ~5 M parameters cannot do better. The table above
+  is what this pipeline actually achieves, measured on a held-out split with no
+  audio overlap with training.
+
+### Context study: more audio helps
+
+Same checkpoint, same 100 test tracks, two inference protocols:
+
+| protocol | MAE | MedianAE | Acc@1 % | Acc@5 % | Acc_octave_4 % | octave err | P-score |
+|---|---|---|---|---|---|---|---|
+| centre 10 s crop (training protocol) | 15.82 | 4.45 | 24 % | 55 % | 53 % | 17 % | 0.485 |
+| **full 30 s track** | **14.81** | **3.54** | 23 % | **61 %** | **62 %** | **12 %** | **0.520** |
+
+```bash
+python -m src.evaluate --ckpt runs/gtzan/best.pth --crop-seconds 30 \
+    --out-dir runs/gtzan_eval_fulltrack     # artifacts in results/gtzan_fulltrack_30s/
+```
+
+With `src.infer` (5 overlapping windows + median + ±1 semitone TTA) the
+**per-window spread is a usable confidence signal**: 0.7–1.0 BPM on clear 4/4
+material (disco, rock, reggae, hiphop — errors < 2 BPM) versus 10–23 BPM on
+ambiguous tracks, which are also the ones predicted badly.
+
 ### Reproducibility
 
 ```bash
