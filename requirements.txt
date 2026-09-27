@@ -1,0 +1,14 @@
+# Core
+numpy>=1.24
+scipy>=1.10
+pandas>=2.0
+torch>=2.2
+librosa>=0.10.1
+soundfile>=0.12
+tqdm>=4.66
+
+# Evaluation / plots
+matplotlib>=3.7
+
+# Dev / tests
+pytest>=7.4

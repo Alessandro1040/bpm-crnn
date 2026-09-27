@@ -1,0 +1,20 @@
+# Data (GTZAN audio + annotations + mel caches) - never commit
+data/
+*.tar.gz
+
+# Runs / checkpoints / logs
+runs/
+*.pth
+*.pt
+*.ckpt
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.pytest_cache/
+.ipynb_checkpoints/
+
+# OS
+.DS_Store
