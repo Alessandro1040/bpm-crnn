@@ -269,14 +269,27 @@ the GRU to see a 107-frame sequence for a 10 s excerpt.
 ## Results
 
 <!-- RESULTS:START -->
-_Pending: the table below is filled automatically by_
+Test split: **100 held-out GTZAN tracks** (best epoch 54/60, training time 29m23s).
 
-```bash
-python scripts/update_readme_results.py --run runs/gtzan
-```
+| metric | mean output | frame only | song only |
+|---|---|---|---|
+| **MAE** | 15.822 | 16.234 | 15.646 |
+| **RMSE** | 29.577 | 29.753 | 29.539 |
+| **MedianAE** | 4.451 | 4.732 | 4.363 |
+| **Bias** | -4.337 | -5.007 | -3.667 |
+| **Acc_1BPM** | 17.0% | 10.0% | 21.0% |
+| **Acc_1%** | 24.0% | 15.0% | 24.0% |
+| **Acc_2%** | 38.0% | 33.0% | 34.0% |
+| **Acc_5%** | 55.0% | 53.0% | 57.0% |
+| **Acc_octave_1%** | 25.0% | 17.0% | 26.0% |
+| **Acc_octave_4%** | 53.0% | 52.0% | 57.0% |
+| **Octave_error_rate_4%** | 17.0% | 16.0% | 17.0% |
+| **P_score** | 0.485 | 0.462 | 0.495 |
+| **Cemgil** | 0.449 | 0.431 | 0.462 |
 
-_once the training run has written `runs/gtzan/test_metrics.json`_
-_(or copy the content of `runs/gtzan/RESULTS.md`)._
+* octave-tolerant accuracy (within 4 %, factor 1/2 or 2): **53.0%**
+* octave-error rate: **17.0%**
+* full report: `runs/gtzan/RESULTS.md`, `runs/gtzan/test_metrics.json`, per-track predictions via `python -m src.evaluate`
 <!-- RESULTS:END -->
 
 ### Reproducibility

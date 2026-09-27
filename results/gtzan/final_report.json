@@ -1,0 +1,23 @@
+{
+  "state": "done",
+  "epochs_requested": 60,
+  "epochs_completed": 60,
+  "stopped_early": false,
+  "best_epoch": 54,
+  "best_val_MAE": 12.658723258972168,
+  "best_val_Acc_1%": 0.25,
+  "test_MAE": 15.822293434143067,
+  "test_RMSE": 29.577401627537988,
+  "test_Acc_1BPM": 0.17,
+  "test_Acc_1%": 0.24,
+  "test_Acc_5%": 0.55,
+  "test_Acc_octave_4%": 0.53,
+  "test_Octave_error_4%": 0.17,
+  "test_P_score": 0.4850133165568558,
+  "test_Cemgil": 0.44948743190172097,
+  "total_seconds": 1763.8,
+  "total_human": "29m23s",
+  "checkpoint": "runs/gtzan/best.pth",
+  "test_tracks": 100,
+  "finished_at": "2026-09-27 16:47:48"
+}
